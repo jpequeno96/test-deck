@@ -56,8 +56,10 @@ jobs:
     strategy:
       matrix:
         image:
-          - postman-tests
-          - justb4/jmeter
+            - name: postman-tests
+            - alias: postman-tests
+            - name: justb4/jmeter
+            - alias: justb4-jmeter
 
     steps:
       - name: 📥 Checkout code
@@ -71,19 +73,19 @@ jobs:
         if: matrix.image == 'justb4/jmeter'
         run: docker pull justb4/jmeter
 
-      - name: 🔎 Run Trivy on image ${{ matrix.image }}
+      - name: 🔎 Run Trivy on image ${{ matrix.image.name }}
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ matrix.image }}
+          image-ref: ${{ matrix.image.name }}
           format: json
-          output: trivy-${{ matrix.image }}.json
+          output: trivy-${{ matrix.image.alias }}.json
           ignore-unfixed: true
 
-      - name: 📦 Upload Trivy report for ${{ matrix.image }}
+      - name: 📦 Upload Trivy report for ${{ matrix.image.name }}
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-${{ matrix.image }}-report
-          path: trivy-${{ matrix.image }}.json
+          name: trivy-${{ matrix.image.alias }}-report
+          path: trivy-${{ matrix.image.alias }}.json
 
 
