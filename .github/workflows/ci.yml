@@ -19,7 +19,21 @@ jobs:
           docker build -t postman-tests .
           docker run postman-tests
 
+      - name: 📦 Upload Newman report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: postman-report
+          path: newman-report.json
+
       - name: 🐳 Run JMeter performance tests
         run: |
           docker run --rm -v "${{ github.workspace }}/performance-tests/jmeter:/test" justb4/jmeter \
             -n -t /test/posts-crud.jmx -l /test/results.jtl
+
+      - name: 📦 Upload JMeter results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jmeter-results
+          path: performance-tests/jmeter/results.jtl

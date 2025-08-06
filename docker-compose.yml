@@ -2,8 +2,14 @@ version: "3"
 
 services:
   api-tests:
-    build: .
-    container_name: postman-crud-tests
+    image: postman/newman:latest
+    volumes:
+      - ./api-tests/postman:/etc/newman
+    working_dir: /etc/newman
+    command: >
+      run posts-crud-collection.json
+      --reporters cli,json
+      --reporter-json-export newman-report.json
 
   performance-jmeter:
     image: justb4/jmeter
