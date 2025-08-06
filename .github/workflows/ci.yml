@@ -17,8 +17,8 @@ jobs:
 
       - name: 🐳 Run Postman tests with Docker
         run: |
-          docker build -t postman-tests .
-          docker run postman-tests
+          docker build -t postman-tests ./api-tests/
+          docker run -v ${{ github.workspace }}/api-tests/postman:/etc/newman postman-tests
 
       - name: 📦 Upload Newman report
         if: always()
