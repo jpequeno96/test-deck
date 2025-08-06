@@ -1,0 +1,25 @@
+name: CI Test Deck
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-deck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎️ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐳 Run Postman tests with Docker
+        run: |
+          docker build -t postman-tests .
+          docker run postman-tests
+
+      - name: 🐳 Run JMeter performance tests
+        run: |
+          docker run --rm -v "${{ github.workspace }}/performance-tests/jmeter:/test" justb4/jmeter \
+            -n -t /test/posts-crud.jmx -l /test/results.jtl
