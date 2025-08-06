@@ -1,0 +1,6 @@
+version: "3"
+
+services:
+  api-tests:
+    build: .
+    container_name: postman-crud-tests
