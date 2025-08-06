@@ -7,11 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  test-deck:
+  postman-tests:
+    name: 🧪 API Functional Tests (Postman)
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛎️ Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v3
 
       - name: 🐳 Run Postman tests with Docker
@@ -26,6 +27,15 @@ jobs:
           name: postman-report
           path: api-tests/postman/newman-report.json
 
+  jmeter-tests:
+    name: 🚀 Performance Tests (JMeter)
+    runs-on: ubuntu-latest
+    needs: postman-tests
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
       - name: 🐳 Run JMeter performance tests
         run: |
           docker run --rm -v "${{ github.workspace }}/performance-tests/jmeter:/test" justb4/jmeter \
@@ -37,3 +47,43 @@ jobs:
         with:
           name: jmeter-results
           path: performance-tests/jmeter/results.jtl
+
+
+  docker-security-scan:
+    name: 🔐 Docker Image Security Scan
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        image:
+          - postman-tests
+          - justb4/jmeter
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐳 Build local image (Custom)
+        if: matrix.image == 'postman-tests'
+        run: docker build -t postman-tests .
+
+      - name: 🔽 Pull external image (Public)
+        if: matrix.image == 'justb4/jmeter'
+        run: docker pull justb4/jmeter
+
+      - name: 🔎 Run Trivy on image ${{ matrix.image }}
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ matrix.image }}
+          format: json
+          output: trivy-${{ matrix.image }}.json
+          ignore-unfixed: true
+
+      - name: 📦 Upload Trivy report for ${{ matrix.image }}
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-${{ matrix.image }}-report
+          path: trivy-${{ matrix.image }}.json
+
+
