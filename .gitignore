@@ -1,0 +1,15 @@
+# Logs
+*.log
+*.jtl
+
+# Node or npm stuff (if used later)
+node_modules/
+
+# Reports
+/reports/
+/*.html
+
+# VSCode
+.vscode/
+
+\api-tests\postman\newman-report.json
