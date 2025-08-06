@@ -51,6 +51,7 @@ jobs:
 
   docker-security-scan:
     name: 🔐 Docker Image Security Scan
+    needs: ['postman-tests', 'jmeter-tests']
     runs-on: ubuntu-latest
 
     strategy:
