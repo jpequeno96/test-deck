@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🐳 Run Postman tests with Docker
         run: |
@@ -26,6 +26,21 @@ jobs:
         with:
           name: postman-report
           path: api-tests/postman/newman-report.json
+
+      - name: 🔎 Run Trivy on Postman image and export JSON
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: postman-tests
+          format: json
+          output: trivy-postman-report.json
+          ignore-unfixed: true
+
+      - name: 📦 Upload Postman Trivy report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-postman-security-report
+          path: trivy-postman-report.json        
 
   jmeter-tests:
     name: 🚀 Performance Tests (JMeter)
@@ -48,45 +63,26 @@ jobs:
           name: jmeter-results
           path: performance-tests/jmeter/results.jtl
 
-
-  docker-security-scan:
-    name: 🔐 Docker Image Security Scan
-    needs: ['postman-tests', 'jmeter-tests']
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        image:
-            - name: postman-tests
-              alias: postman-tests
-            - name: justb4/jmeter
-              alias: justb4-jmeter
-
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v3
-
-      - name: 🐳 Build local image (Custom)
-        if: matrix.image == 'postman-tests'
-        run: docker build -t postman-tests .
-
-      - name: 🔽 Pull external image (Public)
-        if: matrix.image == 'justb4/jmeter'
-        run: docker pull justb4/jmeter
-
-      - name: 🔎 Run Trivy on image ${{ matrix.image.name }}
+      - name: 🔎 Run Trivy on JMeter image and export JSON
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ matrix.image.name }}
+          image-ref: justb4/jmeter
           format: json
-          output: trivy-${{ matrix.image.alias }}.json
+          output: trivy-jmeter-report.json
           ignore-unfixed: true
 
-      - name: 📦 Upload Trivy report for ${{ matrix.image.name }}
-        if: always()
+      - name: 📦 Upload JMeter Trivy report
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-${{ matrix.image.alias }}-report
-          path: trivy-${{ matrix.image.alias }}.json
+          name: trivy-jmeter-security-report
+          path: trivy-jmeter-report.json    
 
 
+  report:
+    name: 📊 Summary Results Report
+    needs: [postman-tests, jmeter-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✉️ Send summary or process artifacts
+        run: echo "All jobs done! Prepare summary here."          
