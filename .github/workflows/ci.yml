@@ -91,14 +91,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+          
+      - name: 📦 Install dependencies
+        run: |
+          cd ui-tests
+          npm ci
 
-      - name: ⬇️ Install dependencies
-        working-directory: ui-tests
-        run: npm install
+      - name: ⬇️ Install Playwright Browsers
+        run: |
+          cd ui-tests
+          npx playwright install --with-deps
 
-      - name: 🧪 Run Playwright tests
-        working-directory: ui-tests
-        run: npm run test:ui
+      - name: ▶️ Run UI Tests
+        run: |
+          cd ui-tests
+          npm run test:ui
 
       - name: 📦 Upload Playwright test results
         if: always()
