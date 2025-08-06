@@ -5,7 +5,7 @@ FROM postman/newman:alpine
 WORKDIR /etc/newman
 
 # Copy the collection file
-COPY api-tests/postman/posts-crud-collection.json .
+COPY postman/posts-crud-collection.json .
 
 # Disable SSL verification with --insecure
 CMD ["run", "posts-crud-collection.json", "--insecure"]
