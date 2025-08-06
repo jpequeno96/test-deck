@@ -4,3 +4,11 @@ services:
   api-tests:
     build: .
     container_name: postman-crud-tests
+
+  performance-jmeter:
+    image: justb4/jmeter
+    container_name: jmeter-tests
+    volumes:
+      - ./performance-tests/jmeter:/test
+    command: -n -t /test/posts-crud.jmx -l /test/results.jtl
+
