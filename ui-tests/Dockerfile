@@ -11,4 +11,4 @@ COPY . .
 RUN npm install
 
 # Run tests (can be overridden by CMD or docker-compose)
-CMD ["npx", "playwright", "test"]
+CMD ["npm", "run", "test:ui"]
