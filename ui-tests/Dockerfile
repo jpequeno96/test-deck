@@ -8,7 +8,4 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm install
-
-# Run tests (can be overridden by CMD or docker-compose)
-CMD ["npm", "run", "test:ui"]
+RUN npm ci

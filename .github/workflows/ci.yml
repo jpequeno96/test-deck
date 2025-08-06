@@ -87,25 +87,14 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+      - name: 🐳 Build Playwright Docker image
+        run: docker build -t ui-tests ./ui-tests
 
-      - name: 📦 Install dependencies
+      - name: 🧪 Run Playwright UI tests inside Docker
         run: |
-          cd ui-tests
-          npm ci
-
-      - name: ⬇️ Install Chromium only
-        run: |
-          cd ui-tests
-          npx playwright install chromium
-
-      - name: ▶️ Run UI Tests on Chromium
-        run: |
-          cd ui-tests
-          npm run test:ui
+          docker run --rm \
+            -v ${{ github.workspace }}/ui-tests/test-results:/app/test-results \
+            ui-tests npm run test:ui
 
       - name: 📦 Upload Playwright HTML Report
         if: always()
@@ -113,7 +102,7 @@ jobs:
         with:
           name: playwright-ui-report
           path: ui-tests/test-results/
-        
+
       - name: 🔎 Run Trivy on Playwright image and export JSON
         uses: aquasecurity/trivy-action@master
         with:
@@ -123,11 +112,11 @@ jobs:
           ignore-unfixed: true
 
       - name: 📦 Upload Playwright Trivy report
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-playwright-security-report
-          path: trivy-playwright-report.json   
+          path: trivy-playwright-report.json
 
 
   report:
