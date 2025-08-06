@@ -57,9 +57,9 @@ jobs:
       matrix:
         image:
             - name: postman-tests
-            - alias: postman-tests
+              alias: postman-tests
             - name: justb4/jmeter
-            - alias: justb4-jmeter
+              alias: justb4-jmeter
 
     steps:
       - name: 📥 Checkout code
