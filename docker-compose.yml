@@ -18,3 +18,12 @@ services:
       - ./performance-tests/jmeter:/test
     command: -n -t /test/posts-crud.jmx -l /test/results.jtl
 
+  ui-tests:
+    build:
+      context: ./ui-tests
+      dockerfile: Dockerfile
+    container_name: ui-tests-runner
+    volumes:
+      - ./ui-tests:/app
+    working_dir: /app
+
