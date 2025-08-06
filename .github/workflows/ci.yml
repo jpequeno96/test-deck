@@ -91,18 +91,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          
+
       - name: 📦 Install dependencies
         run: |
           cd ui-tests
           npm ci
 
-      - name: ⬇️ Install Playwright Browsers
+      - name: ⬇️ Install Chromium only
         run: |
           cd ui-tests
-          npx playwright install --with-deps
+          npx playwright install chromium
 
-      - name: ▶️ Run UI Tests
+      - name: ▶️ Run UI Tests on Chromium
         run: |
           cd ui-tests
           npm run test:ui
