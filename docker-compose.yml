@@ -22,8 +22,9 @@ services:
     build:
       context: ./ui-tests
       dockerfile: Dockerfile
-    container_name: ui-tests-runner
+    container_name: ui-tests
     volumes:
       - ./ui-tests:/app
     working_dir: /app
+    command: ["npx", "playwright", "test"]
 

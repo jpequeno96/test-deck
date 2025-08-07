@@ -92,8 +92,9 @@ jobs:
 
       - name: 🧪 Run Playwright UI tests inside Docker
         run: |
-          docker run --rm \
+            docker run --rm \
             -v ${{ github.workspace }}/ui-tests/test-results:/app/test-results \
+            -w /app \
             ui-tests npm run test:ui
 
       - name: 📦 Upload Playwright HTML Report
@@ -125,4 +126,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ✉️ Send summary or process artifacts
-        run: echo "All jobs done! Prepare summary here."          
+        run: echo "All jobs done! Prepare summary here." 
+        
+      - name: 📊 Process all reports
+        run: |
+          echo "Performance Tests:"
+          cat jmeter-results/results.jtl
+
+          echo "Api Tests:"
+          cat postman-report/newman-report.json
+
+          echo "UI Tests:"
+          ls playwright-ui-report/

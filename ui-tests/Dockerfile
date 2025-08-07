@@ -1,11 +1,11 @@
-# Use the official Playwright image
-FROM mcr.microsoft.com/playwright:v1.44.0-jammy
+FROM mcr.microsoft.com/playwright:v1.54.2-jammy
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy project files
 COPY . .
 
-# Install dependencies
-RUN npm ci
+RUN npm install
+
+RUN npx playwright install chromium
+
+CMD ["npx", "playwright", "test"]
